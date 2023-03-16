@@ -6,7 +6,7 @@
 load Add16.hdl,
 output-file Add16.out,
 compare-to Add16.cmp,
-output-list a%B1.16.1 b%B1.16.1 out%B1.16.1;
+output-list a%B1.16.1 b%B1.16.1 out%B1.16.1 over%B3.1.3;
 
 set a %B0000000000000000,
 set b %B0000000000000000,
@@ -20,6 +20,16 @@ output;
 
 set a %B1111111111111111,
 set b %B1111111111111111,
+eval,
+output;
+
+set a %B1000000000000000,
+set b %B1000000000000000,
+eval,
+output;
+
+set a %B0100000000000000,
+set b %B0100000000000000,
 eval,
 output;
 
