@@ -41,6 +41,7 @@ CHIP ALU {
         zr, // 1 if (out == 0), 0 otherwise
         ng; // 1 if (out < 0),  0 otherwise
 
+
     PARTS:
    // Put you code here:
 
@@ -65,9 +66,18 @@ CHIP ALU {
    Mux16(a=andedxy, b=addedxy, sel=f, out=output);
 
    Not16(in=output, out=notoutput);
-   /* 
-   Mux(a[0]=output[0], b[0]=notoutput[0], sel=no, out=ng);
-   Mux(a[0]=output[0], b[0]=notoutput[0], sel=no, out=zr); */
+
+    Mux16(a=output, b=notoutput, sel=no, out=tempout);
+
+    //check whether or not output is 0
+    Or16Way(in=tempout,out=zrcheck);
+    Not(in=zrcheck, out=zr);
+
+    And16(a=true, b=tempout, out[15]=ng, out[0...14]=dropper);
 
    Mux16(a=output, b=notoutput, sel=no, out=out);
+
+    
+
+
 }
