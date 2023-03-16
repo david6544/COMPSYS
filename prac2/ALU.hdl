@@ -44,5 +44,29 @@ CHIP ALU {
     PARTS:
    // Put you code here:
 
-   
+   //zx command zeroing x if zx
+   Mux16(a=x, b=false, sel=zx, out=newx);
+   //zy command zeroing y if zy 
+   Mux16(a=y, b=false, sel=zy, out=newy);
+
+   //making a not x
+   Not16(in=newx, out=notx);
+   //making a not y
+   Not16(in=newy, out=noty);
+
+   //checking nx to not x
+   Mux16(a=newx, b=notx, sel=nx, out=notnewx);
+   //checking ny to not y
+   Mux16(a=newy, b=noty, sel=ny, out=notnewy);
+
+   Add16(a=notnewx, b=notnewy, out=addedxy);
+   And16(a=notnewx, b=notnewy, out=andedxy);
+
+   Mux16(a=andedxy, b=addedxy, sel=f, out=output);
+
+   Not16(in=output, out=notoutput);/* 
+   Mux(a[0]=output[0], b[0]=notoutput[0], sel=no, out=ng);
+   Mux(a[0]=output[0], b[0]=notoutput[0], sel=no, out=zr); */
+
+   Mux16(a=output, b=notoutput, sel=no, out=out);
 }
