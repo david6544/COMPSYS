@@ -10,7 +10,7 @@ CHIP Or16Way {
 
     PARTS:
     // Put you code here:
-    Or8Way(in=in[0...7], out=temp1);
-    Or8Way(in=in[8...15], out=temp2);
+    Or8Way(in=in[0..7], out=temp1);
+    Or8Way(in=in[8..15], out=temp2);
     Or(a=temp1, b=temp2, out=out);
 }
