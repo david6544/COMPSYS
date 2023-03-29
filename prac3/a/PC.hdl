@@ -17,4 +17,18 @@ CHIP PC {
 
     PARTS:
     // Put your code here:
+
+    Inc16(in=add1, out=incIn);
+
+    //final else
+    Mux16(a=add1, b=incIn, sel=inc, out=adder);
+
+    //normal or added else
+    Mux16(a=adder, b=in, sel=load, out=normal);
+
+    //reset to false first if statment
+    Mux16(a=normal, b=false, sel=reset, out=final);
+
+    //clock fucntion register
+    Register(in=final, load=true, out=add1, out=out);
 }
