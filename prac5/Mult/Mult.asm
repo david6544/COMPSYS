@@ -8,12 +8,13 @@
 
 // Put your code here.
 
-    // Store R2
-    @R2
-    D=M
+@R2
+D=M
+@NEGATIVE_LOOP
+D;JLT
 
     // Loop and add R1 to itself, R2 Times, until R2 is 0
-(LOOP)
+(POSITIVE_LOOP)
     // Breaking the loop
     @R2
     D=M
@@ -32,8 +33,28 @@
     @R2
     M=M-1
 
-    @LOOP
+    @POSITIVE_LOOP
     0;JMP
+
+(NEGATIVE_LOOP) //Same as above, but for negative numbers
+    @R2
+    D=M
+    @END
+    D;JEQ
+
+    @R1
+    D=M
+
+    @R0
+    M=M-D
+
+    @R2
+    M=M+1
+
+    @NEGATIVE_LOOP
+    0;JMP
+
+
 (END)
     @END
     0;JMP
