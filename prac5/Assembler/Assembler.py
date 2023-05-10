@@ -148,13 +148,17 @@ class Assembler:
         """
         counter = 0
         for inst in instructions:
-            counter += 1
             intType = self.parseInstructionType(inst)
             if intType == "A_INSTRUCTION":
-                counter -= 1
                 label = self.parseSymbol(inst)
-                if sTable.get(label) == None:
-                    sTable[label] = counter
+                if sTable.get(label) == None and label.isdigit() == False:
+                    counter += 1
+                    sTable[label] = 15 + counter
+                elif sTable.get(label) == None:
+                    sTable[label] = int(label)
+        
+        for symbol in sTable: 
+            print(symbol, sTable[symbol])
         
         pass
     
@@ -176,7 +180,7 @@ class Assembler:
             if intType == "A_INSTRUCTION":
                 counter -= 1
                 symb = self.parseSymbol(inst)
-                if symb in sTable:
+                if symb in sTable or symb:
                     newsymb = self.translateSymbol(symb, sTable)
                     instructions2.append("0" + newsymb)
                 else:
@@ -196,7 +200,8 @@ class Assembler:
         for i in instructions2:
             print(i)
 
-        """  for symbol in sTable: print(symbol, sTable[symbol]) """
+        
+
         
         return instructions2
        
