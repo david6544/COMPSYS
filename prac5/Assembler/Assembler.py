@@ -147,16 +147,17 @@ class Assembler:
         @param symbolTable: The symbol table to populate.
         """
         counter = 0
+        counter2 = 0
         for inst in instructions:
+            counter2 += 1
             intType = self.parseInstructionType(inst)
-            if intType == "A_INSTRUCTION":
+            if intType == "L_INSTRUCTION":
+                counter2 -= 1
                 label = self.parseSymbol(inst)
-                if sTable.get(label) == None and label.isdigit() == False:
-                    counter += 1
-                    sTable[label] = 15 + counter
-                elif sTable.get(label) == None:
-                    sTable[label] = int(label)
-        
+                if sTable.get(label) == None:
+                    sTable[label] = counter2
+                print(label)
+                print(counter2)
         for symbol in sTable: 
             print(symbol, sTable[symbol])
         
@@ -180,11 +181,12 @@ class Assembler:
             if intType == "A_INSTRUCTION":
                 counter -= 1
                 symb = self.parseSymbol(inst)
-                if symb in sTable or symb:
-                    newsymb = self.translateSymbol(symb, sTable)
-                    instructions2.append("0" + newsymb)
-                else:
+                if sTable.get(symb) == None:
+                    print("Test")
                     sTable[symb] = counter
+                newsymb = self.translateSymbol(symb, sTable)
+                instructions2.append("0" + newsymb)
+
             elif intType == "C_INSTRUCTION":
                     dest = self.parseInstructionDest(inst)
                     bDest = self.translateDest(dest)
@@ -214,10 +216,10 @@ class Assembler:
         @return: The type of the instruction (A_INSTRUCTION, C_INSTRUCTION, L_INSTRUCTION, NULL)
         """
         
-        if instruction[0] == "@":
+        if instruction[0] == "(":
+            return "L_INSTRUCTION"
+        elif instruction[0] == "@":
             return "A_INSTRUCTION"
-        elif instruction[0] == "(":
-            return "L_instruction"
         else:
             return "C_INSTRUCTION"
     
@@ -236,6 +238,7 @@ class Assembler:
         elif (instruction.find(";") != -1 ):
             print("test2")
             if (instruction[0] == '0'):
+                print("test3")
                 return "NULL"
             return instruction.split(";")[0]
     
@@ -267,14 +270,14 @@ class Assembler:
         @return: The computation/op-code of the instruction (see instruction_comp)
         """
         """ return the substring of the instruction after the = sign """
-        counter = 0
-        for i in instruction:
-            counter += 1
-            if i == "=":
-                return instruction[counter:]
-            
-        return "0"
-    
+
+
+
+        if (instruction.find("=") != -1 ):
+            return instruction.split("=")[1]
+        elif (instruction.find(";") != -1 ):
+            return instruction.split(";")[0]
+                
     
     def parseSymbol(self, instruction):
         """
@@ -287,8 +290,8 @@ class Assembler:
 
         if instruction[0] == "@":
             return instruction[1:]
-        elif instruction[1] == "(":
-            return instruction[2:-1]
+        elif instruction[0] == "(":
+            return instruction[1:-1]
 
         return ""
     
