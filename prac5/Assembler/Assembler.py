@@ -153,7 +153,8 @@ class Assembler:
             if intType == "A_INSTRUCTION":
                 counter -= 1
                 label = self.parseSymbol(inst)
-                sTable[label] = counter
+                if sTable.get(label) == None:
+                    sTable[label] = counter
         
         pass
     
@@ -197,7 +198,7 @@ class Assembler:
 
         """  for symbol in sTable: print(symbol, sTable[symbol]) """
         
-        return ""
+        return instructions2
        
 
     def parseInstructionType(self, instruction):
@@ -325,6 +326,8 @@ class Assembler:
         @param symbolTable: The symbol table for looking up label/variable names
         @return: A String containing the 15 binary bits that correspond to the given sybmol.
         """
+        
+        print(symbol, " -- ",sTable[symbol], " -- ", int(sTable[symbol]))
 
         return bin(int(sTable[symbol]))[2:].zfill(15)
     
