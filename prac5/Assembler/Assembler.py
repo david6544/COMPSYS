@@ -273,7 +273,7 @@ class Assembler:
             if i == "=":
                 return instruction[counter:]
             
-        return "NULL"
+        return "0"
     
     
     def parseSymbol(self, instruction):
