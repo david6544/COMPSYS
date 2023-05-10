@@ -332,7 +332,7 @@ class Assembler:
         @return: A String containing the 15 binary bits that correspond to the given sybmol.
         """
         
-        #print(symbol, " -- ",sTable[symbol], " -- ", int(sTable[symbol]))
+        print(symbol, " -- ",sTable[symbol], " -- ", int(sTable[symbol]))
 
         return bin(int(sTable[symbol]))[2:].zfill(15)
     
@@ -346,7 +346,7 @@ if __name__ == "__main__":
         with open(sys.argv[1], "r") as a_file:
             # Read line-by-line, skip comments and empty line
             for line in a_file:
-                if line[0] != '/' and line[0] != "\n" and line[0] != "\r":
+                if line[0] != '/' and line[0] != "\n":
                     instructions.append(line.strip())
         assembler = Assembler()
         symbolTable = SymbolTable()
