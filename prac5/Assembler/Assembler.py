@@ -346,7 +346,7 @@ if __name__ == "__main__":
         with open(sys.argv[1], "r") as a_file:
             # Read line-by-line, skip comments and empty line
             for line in a_file:
-                if line[0] != '/' and line[0] != "\n":
+                if line[0] != '/' and line[0] != "\n" and line[0] != "\r":
                     instructions.append(line.strip())
         assembler = Assembler()
         symbolTable = SymbolTable()
