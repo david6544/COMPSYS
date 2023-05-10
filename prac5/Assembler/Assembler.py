@@ -177,7 +177,7 @@ class Assembler:
                 symb = self.parseSymbol(inst)
                 if symb in sTable:
                     newsymb = self.translateSymbol(symb, sTable)
-                    instructions2.append(newsymb)
+                    instructions2.append("0" + newsymb)
                 else:
                     sTable[symb] = counter
             elif intType == "C_INSTRUCTION":
