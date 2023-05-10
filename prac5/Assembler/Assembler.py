@@ -174,7 +174,7 @@ class Assembler:
         @return: A String containing the generated machine code as strings of 16-bit binary instructions, 1-per-line.
         """
         
-        instructions2 = []
+        instructions2 = ""
         counter = 0
         for inst in instructions:
             #print(inst)
@@ -187,7 +187,7 @@ class Assembler:
                     #print("Test")
                     sTable[symb] = counter
                 newsymb = self.translateSymbol(symb, sTable)
-                instructions2.append("0" + newsymb)
+                instructions2 += "0" + newsymb + "\n"
                 counter += 1
 
             elif intType == "C_INSTRUCTION":
@@ -197,7 +197,7 @@ class Assembler:
                     bComp = self.translateComp(comp)
                     jump = self.parseInstructionJump(inst)
                     bJump = self.translateJump(jump)
-                    instructions2.append("111" + bComp + bDest + bJump)
+                    instructions2 += "111" + bComp + bDest + bJump + "\n"
             else:
                 continue
             #print(inst)
@@ -207,7 +207,7 @@ class Assembler:
 
         
 
-        
+        instructions2 = instructions2[:-1]
         return instructions2
        
 
@@ -332,7 +332,7 @@ class Assembler:
         @return: A String containing the 15 binary bits that correspond to the given sybmol.
         """
         
-        print(symbol, " -- ",sTable[symbol], " -- ", int(sTable[symbol]))
+        #print(symbol, " -- ",sTable[symbol], " -- ", int(sTable[symbol]))
 
         return bin(int(sTable[symbol]))[2:].zfill(15)
     
@@ -355,4 +355,5 @@ if __name__ == "__main__":
         # Second pass
         code = assembler.generateMachineCode(instructions,symbolTable)
         # Print output
+        #remove the newline at the end of code
         print(code)
