@@ -177,14 +177,14 @@ class Assembler:
         instructions2 = []
         counter = 0
         for inst in instructions:
-            print(inst)
+            #print(inst)
             counter += 1
             intType = self.parseInstructionType(inst)
             if intType == "A_INSTRUCTION":
                 counter -= 1
                 symb = self.parseSymbol(inst)
                 if sTable.get(symb) == None:
-                    print("Test")
+                    #print("Test")
                     sTable[symb] = counter
                 newsymb = self.translateSymbol(symb, sTable)
                 instructions2.append("0" + newsymb)
@@ -200,10 +200,10 @@ class Assembler:
                     instructions2.append("111" + bComp + bDest + bJump)
             else:
                 continue
-            print(inst)
+            #print(inst)
 
-        for i in instructions2:
-            print(i)
+        #for i in instructions2:
+            #print(i)
 
         
 
@@ -236,7 +236,7 @@ class Assembler:
         """
         """ return the substring of the instruction until the = sign is reached, or until the ; sign is reached """
         if (instruction.find("=") != -1 ):
-            print("test1")
+            #print("test1")
             return instruction.split("=")[0]
     
         return "NULL"
@@ -332,7 +332,7 @@ class Assembler:
         @return: A String containing the 15 binary bits that correspond to the given sybmol.
         """
         
-        print(symbol, " -- ",sTable[symbol], " -- ", int(sTable[symbol]))
+        #print(symbol, " -- ",sTable[symbol], " -- ", int(sTable[symbol]))
 
         return bin(int(sTable[symbol]))[2:].zfill(15)
     
