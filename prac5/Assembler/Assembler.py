@@ -149,6 +149,7 @@ class Assembler:
         counter = 0
         counter2 = 0
         for inst in instructions:
+            #print(inst)
             counter2 += 1
             intType = self.parseInstructionType(inst)
             if intType == "L_INSTRUCTION":
@@ -156,10 +157,10 @@ class Assembler:
                 label = self.parseSymbol(inst)
                 if sTable.get(label) == None:
                     sTable[label] = counter2
-                print(label)
-                print(counter2)
-        for symbol in sTable: 
-            print(symbol, sTable[symbol])
+                #print(label)
+                #print(counter2)
+        #for symbol in sTable: 
+            #print(symbol, sTable[symbol])
         
         pass
     
@@ -176,6 +177,7 @@ class Assembler:
         instructions2 = []
         counter = 0
         for inst in instructions:
+            print(inst)
             counter += 1
             intType = self.parseInstructionType(inst)
             if intType == "A_INSTRUCTION":
@@ -186,6 +188,7 @@ class Assembler:
                     sTable[symb] = counter
                 newsymb = self.translateSymbol(symb, sTable)
                 instructions2.append("0" + newsymb)
+                counter += 1
 
             elif intType == "C_INSTRUCTION":
                     dest = self.parseInstructionDest(inst)
@@ -235,12 +238,6 @@ class Assembler:
         if (instruction.find("=") != -1 ):
             print("test1")
             return instruction.split("=")[0]
-        elif (instruction.find(";") != -1 ):
-            print("test2")
-            if (instruction[0] == '0'):
-                print("test3")
-                return "NULL"
-            return instruction.split(";")[0]
     
         return "NULL"
     
