@@ -91,6 +91,7 @@ cTable = {
     "M+1": "1110111",
     "M-1": "1110010",
     "D+M": "1000010",
+    "M+D": "1000010",
     "D-M": "1010011",
     "M-D": "1000111",
     "D&M": "1000000",
@@ -176,6 +177,7 @@ class Assembler:
         
         instructions2 = ""
         counter = 0
+        counter2 = 0;
         for inst in instructions:
             #print(inst)
             counter += 1
@@ -183,9 +185,12 @@ class Assembler:
             if intType == "A_INSTRUCTION":
                 counter -= 1
                 symb = self.parseSymbol(inst)
-                if sTable.get(symb) == None:
+                if sTable.get(symb) == None and symb.isdigit() == False:
                     #print("Test")
-                    sTable[symb] = counter
+                    counter2 += 1
+                    sTable[symb] = 15 + counter2
+                elif sTable.get(symb) == None and symb.isdigit() == True:
+                    sTable[symb] = symb
                 newsymb = self.translateSymbol(symb, sTable)
                 instructions2 += "0" + newsymb + "\n"
                 counter += 1
