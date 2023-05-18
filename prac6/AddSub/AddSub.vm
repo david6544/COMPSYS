@@ -4,8 +4,8 @@
 
 // Put your code here.
 
-push local 3
-push local 4
+push local 0
+push local 1
 add
 push static 0
 sub
