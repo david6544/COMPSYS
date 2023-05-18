@@ -3,9 +3,27 @@
 
 // Put your code here
 
+push static 0
+push constant 0
+lt
+if-goto ifNegative
+
+push static 0
+goto TEMP
 
 
+label TEMP
+    pop static 1
+    goto END
+
+label ifNegative
+    push static 0
+    neg
+    goto TEMP
+
+
+    
 
 
 label END
-goto END
+    goto END
