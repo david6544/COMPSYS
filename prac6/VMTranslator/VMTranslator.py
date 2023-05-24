@@ -10,7 +10,12 @@ class VMTranslator:
 
     def vm_add():
         '''Generate Hack Assembly code for a VM add operation'''
-        return ""
+        newstr = "@SP"
+        newstr += "\nAM=M-1"
+        newstr += "\nD=M"
+        newstr += "\nA=A-1"
+        newstr += "\nM=D+M"
+        return newstr
 
     def vm_sub():
         '''Generate Hack Assembly code for a VM sub operation'''
