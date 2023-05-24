@@ -15,6 +15,11 @@
     lt
     if-goto NEGATIVE_Y
 
+    push static 0
+    push constant 0
+    lt
+    if-goto NEGATIVE_LOOP
+
 label LOOP
     //check if y is = 0
     push static 2
@@ -34,14 +39,59 @@ label LOOP
     pop local 0
     goto LOOP
 
-label NEGATIVE_Y
+label NEGATIVE_LOOP
+     //check if y is = 0
     push local 0
     neg
     pop local 0
+
+    push static 2
+    push constant 0
+    eq
+    if-goto NEG_END
+
+    push local 0
+    neg
+    pop local 0
+
+    // sub 1 from y and add x to accumulator
+    push static 2
+    push constant 1
+    sub
+    pop static 2
+    
+    push static 0
+    push local 0
+    add
+    pop local 0
+    goto NEGATIVE_LOOP
+
+
+
+label NEGATIVE_Y
+
+    push local 0
+    push constant 0
+    lt
+    if-goto NEG_BOTH
+
     push static 2
     neg
     pop static 2
-    goto LOOP
+    goto NEGATIVE_LOOP
+
+
+
+label NEG_BOTH
+    push local 0
+    neg
+    pop local 0
+    goto NEGATIVE_LOOP
+
+    
 
 label END
     goto END
+
+label NEG_END
+    goto NEG_END
