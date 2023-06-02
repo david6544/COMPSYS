@@ -19,14 +19,8 @@ struct allTokens
     public:
     allTokens();
     allTokens(std::list<Token*>);
-
     Token* popToken();
     Token* top();
-    Token* top(int i);
-    std::string popVal(int i);
-    std::string popType(int i);
-    std::string toString();
-
 };
 
 

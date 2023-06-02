@@ -48,26 +48,6 @@ Token* allTokens::popToken() {
 
 Token* allTokens::top() {
     return tokens[0];
-} 
-
-Token* allTokens::top(int i) {
-    return tokens[i];
-}
-
-string allTokens::popVal(int i) {
-    return tokens[i]->getValue();
-}
-
-string allTokens::popType(int i) {
-    return tokens[i]->getType();
-}
-
-string allTokens::toString() {
-    string result = "";
-    for (auto i = tokens.begin(); i != tokens.end(); ++i){
-        result +=  (*i)->tostring();
-    }
-    return result;
 }
 
 
