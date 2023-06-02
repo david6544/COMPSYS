@@ -75,13 +75,23 @@ ParseTree* CompilerParser::compileProgram() {
  * @return a ParseTree
  */
 ParseTree* CompilerParser::compileClass() {
+    //cheeky lambda function
+    auto isSymbol = [](ParseTree* p)
+        {
+            if(p == nullptr) return true;
+            if(p->getType() == "symbol") {
+                if(p->getValue() == "}") return true;
+            }
+            return false;
+        };
+    
     ParseTree *pTree = new ParseTree("class", "");
 
     pTree->addChild(tokens.popToken());
     pTree->addChild(tokens.popToken());
     pTree->addChild(tokens.popToken());
 
-    while (pTree->getChildren().back() != nullptr || (pTree->getChildren().back()->getType() != "symbol" && pTree->getChildren().back()->getValue() != "}")) {
+    while (isSymbol(pTree->getChildren().back()) == false) {
         Token* curr = tokens.peek();
 
         //checkiung for classVariableDeclaration
