@@ -196,7 +196,7 @@ ParseTree* CompilerParser::compileParameterList() {
  * @return a ParseTree
  */
 ParseTree* CompilerParser::compileSubroutineBody() {
-    ParseTree *pTree = new ParseTree("subroutineBody", "");
+    /* ParseTree *pTree = new ParseTree("subroutineBody", "");
     
     pTree->addChild(tokens.popToken()); // add {
 
@@ -215,7 +215,8 @@ ParseTree* CompilerParser::compileSubroutineBody() {
     
     // add validation
 
-    return pTree;
+    return pTree; */
+    return NULL;
 }
 
 /**
@@ -223,7 +224,7 @@ ParseTree* CompilerParser::compileSubroutineBody() {
  * @return a ParseTree
  */
 ParseTree* CompilerParser::compileVarDec() {
-    ParseTree *pTree = new ParseTree("subroutineBody", "");
+   /*  ParseTree *pTree = new ParseTree("subroutineBody", "");
     
     pTree->addChild(tokens.popToken()); // var
     pTree->addChild(tokens.popToken()); // type
@@ -237,11 +238,11 @@ ParseTree* CompilerParser::compileVarDec() {
         curr = tokens.top();
     }
 
-    pTree->addChild(tokens.popToken()); // ;
+    pTree->addChild(tokens.popToken()); // ; */
 
     //validate
 
-    
+    return NULL;
     return pTree;
 }
 
