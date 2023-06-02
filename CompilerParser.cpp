@@ -18,6 +18,7 @@ allTokens::allTokens(std::list<Token*> tokens){
 
 Token* allTokens::popToken() {
     //process token by checking through grammarMaps against typing
+    
     return NULL;
 }
 
@@ -74,8 +75,26 @@ ParseTree* CompilerParser::compileProgram() {
  * @return a ParseTree
  */
 ParseTree* CompilerParser::compileClass() {
-    
-    return NULL;
+    ParseTree *pTree = new ParseTree("class", "");
+
+    pTree->addChild(tokens.popToken());
+    pTree->addChild(tokens.popToken());
+    pTree->addChild(tokens.popToken());
+
+    while (pTree->getChildren().back() == nullptr || (pTree->getChildren().back()->getType() == "symbol" && pTree->getChildren().back()->getValue() == "}")) {
+        Token* curr = tokens.peek();
+
+        //checkiung for classVariableDeclaration
+        if (curr->getType() == "keyword" && (curr->getValue() == "static" || curr->getValue() == "field")) {
+            pTree->addChild(compileClassVarDec());
+        } else if (curr->getType() == "keyword" && (curr->getValue() == "constructor" || curr->getValue() == "function" || curr->getValue() == "method")) {
+            pTree->addChild(compileSubroutine());
+        } else {
+            pTree->addChild(tokens.popToken());
+        }
+    }
+
+    return pTree;
 }
 
 /**
