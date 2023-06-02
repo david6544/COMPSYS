@@ -128,6 +128,8 @@ ParseTree* CompilerParser::compileClass() {
         }
     }
 
+    // ADD VALIDATE CLASS
+
     return pTree;
 }
 
@@ -136,7 +138,25 @@ ParseTree* CompilerParser::compileClass() {
  * @return a ParseTree
  */
 ParseTree* CompilerParser::compileClassVarDec() {
-    return NULL;
+    ParseTree * pTree = new ParseTree("classVarDec", "");
+    pTree->addChild(tokens.popToken());
+    pTree->addChild(tokens.popToken());
+    pTree->addChild(tokens.popToken());
+
+   ParseTree * curr = tokens.peek();
+
+   while (curr != nullptr && curr->getValue() == ";") {
+       pTree->addChild(tokens.popToken());
+       pTree->addChild(tokens.popToken());
+       curr = tokens.peek();
+   }
+
+   //add semicol
+    pTree->addChild(tokens.popToken());
+
+    //validate classvardec
+
+    return pTree;
 }
 
 /**
@@ -144,7 +164,21 @@ ParseTree* CompilerParser::compileClassVarDec() {
  * @return a ParseTree
  */
 ParseTree* CompilerParser::compileSubroutine() {
-    return NULL;
+    ParseTree *pTree = new ParseTree("subroutine", "");
+    
+    pTree->addChild(tokens.popToken()); // subtype
+    pTree->addChild(tokens.popToken()); // return type
+    pTree->addChild(tokens.popToken()); // add (
+
+    pTree->addChild(compileParameterList()); // params
+
+    pTree->addChild(tokens.popToken()); // add )
+
+    pTree->addChild(compileSubroutineBody());
+
+    //validate subroutine
+
+    return pTree;
 }
 
 /**
