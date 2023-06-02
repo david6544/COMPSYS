@@ -21,8 +21,8 @@ struct allTokens
     allTokens(std::list<Token*>);
 
     Token* popToken();
-    Token* peek();
-    Token* peek(int i);
+    Token* top();
+    Token* top(int i);
     std::string popVal(int i);
     std::string popType(int i);
     std::string toString();
@@ -31,6 +31,8 @@ struct allTokens
 
 
 class CompilerParser {
+    private:
+    // add validators
     public:
         allTokens tokens;
         CompilerParser(std::list<Token*> tokens);

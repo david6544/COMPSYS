@@ -46,11 +46,11 @@ Token* allTokens::popToken() {
     return curr;
 }
 
-Token* allTokens::peek() {
+Token* allTokens::top() {
     return tokens[0];
 } 
 
-Token* allTokens::peek(int i) {
+Token* allTokens::top(int i) {
     return tokens[i];
 }
 
@@ -99,15 +99,6 @@ ParseTree* CompilerParser::compileProgram() {
  * @return a ParseTree
  */
 ParseTree* CompilerParser::compileClass() {
-    //cheeky lambda function
-    auto isSymbol = [](ParseTree* p)
-        {
-            if(p == nullptr) return true;
-            if(p->getType() == "symbol") {
-                if(p->getValue() == "}") return true;
-            }
-            return false;
-        };
     
     ParseTree *pTree = new ParseTree("class", "");
 
@@ -115,8 +106,8 @@ ParseTree* CompilerParser::compileClass() {
     pTree->addChild(tokens.popToken());
     pTree->addChild(tokens.popToken());
 
-    while (isSymbol(pTree->getChildren().back()) == false) {
-        Token* curr = tokens.peek();
+    Token* curr = tokens.top();
+    while (curr != nullptr && curr->getValue() != "}") {
 
         //checkiung for classVariableDeclaration
         if (curr->getType() == "keyword" && (curr->getValue() == "static" || curr->getValue() == "field")) {
@@ -143,12 +134,12 @@ ParseTree* CompilerParser::compileClassVarDec() {
     pTree->addChild(tokens.popToken());
     pTree->addChild(tokens.popToken());
 
-   ParseTree * curr = tokens.peek();
+   ParseTree * curr = tokens.top();
 
    while (curr != nullptr && curr->getValue() == ";") {
        pTree->addChild(tokens.popToken());
        pTree->addChild(tokens.popToken());
-       curr = tokens.peek();
+       curr = tokens.top();
    }
 
    //add semicol
@@ -186,7 +177,18 @@ ParseTree* CompilerParser::compileSubroutine() {
  * @return a ParseTree
  */
 ParseTree* CompilerParser::compileParameterList() {
-    return NULL;
+    ParseTree *pTree = new ParseTree("parameterList", "");
+    
+    Token * curr = tokens.top();
+
+    while (curr != nullptr && curr->getValue() != ")") {
+        pTree->addChild(tokens.popToken());
+        curr = tokens.top();
+    }
+
+    //add validation
+
+    return pTree;
 }
 
 /**
@@ -194,7 +196,26 @@ ParseTree* CompilerParser::compileParameterList() {
  * @return a ParseTree
  */
 ParseTree* CompilerParser::compileSubroutineBody() {
-    return NULL;
+    ParseTree *pTree = new ParseTree("subroutineBody", "");
+    
+    pTree->addChild(tokens.popToken()); // add {
+
+    Token * curr = tokens.top();
+
+    while (curr != nullptr  && curr->getValue() != "}") {
+        if (curr->getType() == "keyword" && curr->getValue() == "var") {
+            pTree->addChild(compileVarDec());
+        } else {
+            pTree->addChild(compileStatements());
+        }
+        curr = tokens.top();
+    }
+
+    pTree->addChild(tokens.popToken()); // add }
+    
+    // add validation
+
+    return pTree;
 }
 
 /**
@@ -202,7 +223,26 @@ ParseTree* CompilerParser::compileSubroutineBody() {
  * @return a ParseTree
  */
 ParseTree* CompilerParser::compileVarDec() {
-    return NULL;
+    ParseTree *pTree = new ParseTree("subroutineBody", "");
+    
+    pTree->addChild(tokens.popToken()); // var
+    pTree->addChild(tokens.popToken()); // type
+    pTree->addChild(tokens.popToken()); // first ident
+
+    Token * curr = tokens.top();
+
+    while(curr != nullptr && curr->getValue() != ";") {
+        pTree->addChild(tokens.popToken()); // ,
+        pTree->addChild(tokens.popToken()); // ident
+        curr = tokens.top();
+    }
+
+    pTree->addChild(tokens.popToken()); // ;
+
+    //validate
+
+    
+    return pTree;
 }
 
 /**
