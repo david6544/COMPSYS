@@ -243,7 +243,7 @@ ParseTree* CompilerParser::compileVarDec() {
     //validate
 
     return NULL;
-    return pTree;
+    //return pTree;
 }
 
 /**
