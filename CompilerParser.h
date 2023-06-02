@@ -3,6 +3,7 @@
 
 #include <list>
 #include <exception>
+#include <string>
 #include<unordered_map>
 #include<unordered_set>
 #include<vector>
@@ -11,8 +12,27 @@
 #include "ParseTree.h"
 #include "Token.h"
 
+struct allTokens
+{
+    private:
+    std::vector<Token*> tokens;
+    public:
+    allTokens();
+    allTokens(std::list<Token*>);
+
+    Token* popToken();
+    Token* peek();
+    Token* peek(int i);
+    std::string popVal(int i);
+    std::string popType(int i);
+    std::string toString();
+
+};
+
+
 class CompilerParser {
     public:
+        allTokens tokens;
         CompilerParser(std::list<Token*> tokens);
 
         ParseTree* compileProgram();

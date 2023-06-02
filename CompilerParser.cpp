@@ -1,4 +1,50 @@
 #include "CompilerParser.h"
+#include "ParseTree.h"
+#include "Token.h"
+#include <vector>
+#include <unordered_set>
+#include <iostream>
+
+using namespace std;
+
+//List of allTokens Methods
+allTokens::allTokens(){}
+
+allTokens::allTokens(std::list<Token*> tokens){
+    for (auto i = tokens.begin(); i != tokens.end(); ++i){
+        this->tokens.push_back(*i);
+    }
+}
+
+Token* allTokens::popToken() {
+    //process token by checking through grammarMaps against typing
+    return NULL;
+}
+
+Token* allTokens::peek() {
+    return tokens[0];
+} 
+
+Token* allTokens::peek(int i) {
+    return tokens[i];
+}
+
+string allTokens::popVal(int i) {
+    return tokens[i]->getValue();
+}
+
+string allTokens::popType(int i) {
+    return tokens[i]->getType();
+}
+
+string allTokens::toString() {
+    string result = "";
+    for (auto i = tokens.begin(); i != tokens.end(); ++i){
+        result +=  (*i)->tostring();
+    }
+    return result;
+}
+
 
 
 /**
@@ -6,6 +52,7 @@
  * @param tokens A linked list of tokens to be parsed
  */
 CompilerParser::CompilerParser(std::list<Token*> tokens) {
+    this->tokens = allTokens(tokens);
 }
 
 /**
@@ -13,6 +60,12 @@ CompilerParser::CompilerParser(std::list<Token*> tokens) {
  * @return a ParseTree
  */
 ParseTree* CompilerParser::compileProgram() {
+    //first check for a class
+    if (tokens.popVal(0) == "class" && (tokens.popVal(1) == "Main" || tokens.popVal(1) == "main")){
+        return compileClass();
+    } else {
+        throw ParseException();
+    }
     return NULL;
 }
 
@@ -21,6 +74,7 @@ ParseTree* CompilerParser::compileProgram() {
  * @return a ParseTree
  */
 ParseTree* CompilerParser::compileClass() {
+    
     return NULL;
 }
 
