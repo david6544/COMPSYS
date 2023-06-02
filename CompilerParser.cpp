@@ -18,8 +18,32 @@ allTokens::allTokens(std::list<Token*> tokens){
 
 Token* allTokens::popToken() {
     //process token by checking through grammarMaps against typing
-    
-    return NULL;
+    Token * curr = this->tokens.front();
+    if (curr == nullptr) throw ParseException();
+
+    if (curr->getType() == "keyword" && grammarMaps::keyWords.find(curr->getValue()) == grammarMaps::keyWords.end()) {
+        throw ParseException();
+    } else if (curr->getType() == "keyword" && grammarMaps::symbols.find(curr->getValue()) == grammarMaps::symbols.end()) {
+        throw ParseException();
+    } else if (curr->getType() == "integerConstant") {
+        int intConstant = stoi(curr->getValue());
+        if (intConstant < 0 || intConstant > 32767) {
+            throw ParseException();
+        }
+    } else if (curr->getType() == "stringConstant" && (curr->getValue().front() != '\"' || curr->getValue().back() != '\"')) {
+        throw ParseException();
+    } else if (curr->getType() == "identifier") {
+        
+        if (curr->getValue().find_first_not_of("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_()") == string::npos) {
+            throw ParseException();
+        }
+        if (curr->getValue().front() >= '0' && curr->getValue().front() <= '9') {
+            throw ParseException();
+        }
+    }
+    //pop front of tokens
+    this->tokens.erase(this->tokens.begin());
+    return curr;
 }
 
 Token* allTokens::peek() {
