@@ -49,6 +49,9 @@ Token* allTokens::popToken() {
 Token* allTokens::top() {
     return tokens[0];
 }
+string allTokens::popVal(int i) {
+    return tokens[i]->getValue();
+}
 
 
 
