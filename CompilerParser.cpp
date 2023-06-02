@@ -81,7 +81,7 @@ ParseTree* CompilerParser::compileClass() {
     pTree->addChild(tokens.popToken());
     pTree->addChild(tokens.popToken());
 
-    while (pTree->getChildren().back() == nullptr || (pTree->getChildren().back()->getType() == "symbol" && pTree->getChildren().back()->getValue() == "}")) {
+    while (pTree->getChildren().back() != nullptr || (pTree->getChildren().back()->getType() != "symbol" && pTree->getChildren().back()->getValue() != "}")) {
         Token* curr = tokens.peek();
 
         //checkiung for classVariableDeclaration
