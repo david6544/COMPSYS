@@ -5,7 +5,7 @@
  * Constructor for the CompilerParser
  * @param tokens A linked list of tokens to be parsed
  */
-CompilerParser::CompilerParser(std::vector<Token*> tokens) {
+CompilerParser::CompilerParser(std::list<Token*> tokens) {
 }
 
 /**

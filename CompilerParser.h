@@ -13,7 +13,7 @@
 
 class CompilerParser {
     public:
-        CompilerParser(std::vector<Token*> tokens);
+        CompilerParser(std::list<Token*> tokens);
 
         ParseTree* compileProgram();
         ParseTree* compileClass();

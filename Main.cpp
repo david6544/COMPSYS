@@ -1,5 +1,5 @@
 #include <iostream>
-#include <vector>
+#include <list>
 
 #include "CompilerParser.h"
 #include "Token.h"
@@ -12,7 +12,7 @@ int main(int argc, char *argv[]) {
      *
      *     }
      */
-    vector<Token*> tokens;
+    list<Token*> tokens;
     tokens.push_back(new Token("keyword", "class"));
     tokens.push_back(new Token("identifier", "MyClass"));
     tokens.push_back(new Token("symbol", "{"));
