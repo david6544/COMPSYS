@@ -57,37 +57,39 @@ string allTokens::popVal(int i) {
     ALL VALIDATORS FOR METHODS HERE
  */
     bool classValidator(ParseTree* pTree) {
-        vector<ParseTree *> children = pTree->getChildren();
-        
-        if (pTree->getType() != "class" || pTree->getValue() != "") {
-            return false;
-        }
-        //if first element is not class or keyword class
-        if (children.front()->getType() != "keyword" || children.front()->getValue() != "class") {
-            return false;
-        }
-        
-        // if second element isnt an identifier
-        if (children[1]->getType() != "identifier") {
-            return false;
-        }
-        if (children[2]->getType() != "symbol" || children[2]->getValue() != "{") {
-            return false;
-        }
+        std::list<ParseTree *> children = pTree->getChildren();
 
-        int i = 3;
-        while (children[i] != nullptr && (children[i]->getType() != "symbol" && children[i]->getValue() != "}")) {
-            if (children[i]->getType() != "classVarDec" && children[i]->getType() != "subroutine") {
-                return false;
-            }
-            i++;
-        }
+    if (pTree->getType() != "class" || pTree->getValue() != "") {
+        return false;
+    }
+    //if first element is not class or keyword class
+    if (children.front()->getType() != "keyword" || children.front()->getValue() != "class") {
+        return false;
+    }
 
-        if (i != children.size() -1 || children[i]->getValue() != "}") {
+    // if second element isnt an identifier
+    auto it = std::next(children.begin());
+    if ((*it)->getType() != "identifier") {
+        return false;
+    }
+    ++it;
+    if ((*it)->getType() != "symbol" || (*it)->getValue() != "{") {
+        return false;
+    }
+
+    ++it;
+    while (it != children.end() && ((*it)->getType() != "symbol" && (*it)->getValue() != "}")) {
+        if ((*it)->getType() != "classVarDec" && (*it)->getType() != "subroutine") {
             return false;
         }
+        ++it;
+    }
 
-        return true;
+    if (it != std::prev(children.end()) || (*it)->getValue() != "}") {
+        return false;
+    }
+
+    return true;
     }
 
     bool classVarDecValidator(ParseTree* pTree) {
