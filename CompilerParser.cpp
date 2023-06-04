@@ -7,6 +7,12 @@
 
 using namespace std;
 
+    inline bool isInvalidToken(const string& type, const string& val, ParseTree* curr) {
+        if (curr == nullptr) return true;
+        if (curr ->getType() != type && curr->getValue() != val) return true;
+        return false;
+    }
+
 /*
     ALL VALIDATORS FOR METHODS HERE
  */
@@ -257,11 +263,7 @@ using namespace std;
 //methods
 
 //List of allTokens Methods
-inline bool isInvalidToken(const string& type, const string& val, ParseTree* curr) {
-    if (curr == nullptr) return true;
-    if (curr ->getType() != type && curr->getValue() != val) return true;
-    return false;
-}
+
 
 inline bool isValidStatement(ParseTree * curr) {
     if (curr == nullptr) return false;
@@ -573,7 +575,7 @@ ParseTree* CompilerParser::compileLet() {
 
     // add validator
     if(letValidator(pTree) == false) throw ParseException();
-    
+
 
     return pTree;
 }
