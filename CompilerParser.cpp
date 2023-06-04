@@ -143,6 +143,26 @@ using namespace std;
         return true;
     }
     bool subroutineBodyValidator(ParseTree* pTree) {
+        std::list<ParseTree *> children = pTree->getChildren();
+        std::list<ParseTree *>::iterator it = children.begin();
+
+        if ((*it)->getType() != "symbol" || (*it)->getValue() != "{")
+            return false;
+
+        ++it;
+
+        while ((*it)->getType() != "symbol" && (*it)->getValue() != "}")
+        {
+            // these should all only be statements and varDecs which, by this time, are already validated
+            if ((*it)->getType() != "varDec" && (*it)->getType() != "statements")
+            return false;
+
+            ++it;
+        }
+
+        if (it != prev(children.end()))
+            return false;
+
         return true;
     }
     bool varDecValidator(ParseTree* pTree) {
@@ -405,8 +425,8 @@ ParseTree* CompilerParser::compileSubroutineBody() {
     pTree->addChild(popToken()); // add }
     
     // add validation
+    if (subroutineBodyValidator(pTree) == false) throw ParseException();
 
-    //return pTree;
     return pTree;
 }
 
