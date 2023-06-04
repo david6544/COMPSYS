@@ -435,6 +435,10 @@ ParseTree* CompilerParser::compileLet() {
  * @return a ParseTree
  */
 ParseTree* CompilerParser::compileIf() {
+    auto is_end = [](ParseTree* curr) {
+		if(curr == nullptr) return true;
+		return isValidToken("symbol", "}", curr);
+	};
     ParseTree *pTree = new ParseTree ("ifStatement", "");
 
     pTree->addChild(popToken()); // if
@@ -466,13 +470,13 @@ ParseTree* CompilerParser::compileIf() {
         pTree->addChild(popToken()); // else
         pTree->addChild(popToken()); // {
         curr = top();
-        while (curr != nullptr && curr->getValue() != "}") {
+        while (is_end(curr) == false) {
             if (isValidStatement(curr)) {
                 pTree->addChild(compileStatements());
             } else throw ParseException();
             curr = top();
         }
-        if (curr->getValue() != "}") { throw ParseException();} 
+        if (curr != nullptr && curr->getValue() != "}") { throw ParseException();} 
         if (pTree->getChildren().back() != nullptr && pTree->getChildren().back()->getValue()  == "{") {
             pTree->addChild(new ParseTree("statements","")); // }
         }
