@@ -79,7 +79,30 @@ using namespace std;
 
         return true;
         }
+
     bool subroutineValidator(ParseTree* pTree) {
+        if(pTree->getType() != "subroutine" || pTree->getValue() != "") return false;
+
+        list<ParseTree*> children = pTree->getChildren();
+        list<ParseTree*>::iterator it = children.begin();
+        ++it;
+
+        if((*it)->getType() != "keyword" || ((*it)->getValue() != "constructor" && (*it)->getValue() != "function" && (*it)->getValue() != "method")) return false;
+        if ((*it)->getType() != "identifier" || (grammarMaps::variableTypes.find((*it)->getValue()) == grammarMaps::variableTypes.end() && (*it)->getValue() != "void")) {
+            return false;
+        }
+
+        it++;
+        if((*it)->getType() != "identifier") return false;
+        it++;
+        if ((*it)->getType() != "symbol" || ((*it)->getValue() != "(")) return false;
+        it++;
+        if ((*it)->getType() != "parameterList" || (*it)->getValue() != "") return false;
+        it++;
+        if ((*it)->getType() != "symbol" || (*it)->getValue() != ")") return false;
+        it++;
+        if ((*it)->getType() != "subroutineBody" || (*it)->getValue() != "") return false;
+        
         return true;
     }
     bool parameterListValidator(ParseTree* pTree) {
@@ -299,7 +322,9 @@ ParseTree* CompilerParser::compileSubroutine() {
     pTree->addChild(compileSubroutineBody());
 
     //validate subroutine
+    if (subroutineValidator(pTree) == false) throw ParseException();
 
+    
     return pTree;
 }
 
