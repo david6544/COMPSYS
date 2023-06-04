@@ -140,6 +140,12 @@ inline bool isValidStatement(ParseTree * curr) {
     }
 }
 
+inline bool isValidToken(const string& type, const string& val, ParseTree* curr) {
+    if (curr == nullptr) return false;
+    if (curr ->getType() == type && curr->getValue() == val) return true;
+    return false;
+}
+
 Token* CompilerParser::popToken() {
     //process token by checking through grammarMaps against typing
     Token * curr = this->tokens.front();
@@ -401,7 +407,27 @@ ParseTree* CompilerParser::compileStatements() {
  * @return a ParseTree
  */
 ParseTree* CompilerParser::compileLet() {
-    return NULL;
+    ParseTree *pTree = new ParseTree("letStatement", "");
+
+    pTree->addChild(popToken()); // let
+    pTree->addChild(popToken()); // ident
+
+    ParseTree *curr = top();
+    if (curr->getValue() == "[") {
+        pTree->addChild(popToken()); // [
+        pTree->addChild(compileExpression()); // expression
+        pTree->addChild(popToken()); // ]
+    } else if (curr->getValue() == "=") {
+        pTree->addChild(popToken()); // =
+        pTree->addChild(compileExpression()); // expression
+    } else {
+        throw ParseException();
+    }
+
+
+    // add validator
+
+    return pTree;
 }
 
 /**
@@ -409,7 +435,56 @@ ParseTree* CompilerParser::compileLet() {
  * @return a ParseTree
  */
 ParseTree* CompilerParser::compileIf() {
-    return NULL;
+    ParseTree *pTree = new ParseTree ("ifStatement", "");
+
+    pTree->addChild(popToken()); // if
+    pTree->addChild(popToken()); // (
+        pTree->addChild(compileExpression()); // expression
+    pTree->addChild(popToken()); // )
+    pTree->addChild(popToken()); // {
+    
+
+    ParseTree *curr = top();
+
+    while (curr != nullptr && curr->getValue() != "}") {
+        if (isValidStatement(curr)) {
+            pTree->addChild(compileStatements());
+        } else throw ParseException();
+        curr = top();
+    }
+
+    if (pTree->getChildren().back() != nullptr && pTree->getChildren().back()->getValue()  == "{") {
+        pTree->addChild(new ParseTree("statements","")); // }
+    }
+
+    pTree->addChild(popToken()); // }
+
+    // check for an else block
+
+    curr = top();
+    if (curr != nullptr && curr->getValue() == "else") {
+        pTree->addChild(popToken()); // else
+        pTree->addChild(popToken()); // {
+        curr = top();
+        while (curr != nullptr && curr->getValue() != "}") {
+            if (isValidStatement(curr)) {
+                pTree->addChild(compileStatements());
+            } else throw ParseException();
+            curr = top();
+        }
+        if (curr->getValue() != "}") { throw ParseException();} 
+        if (pTree->getChildren().back() != nullptr && pTree->getChildren().back()->getValue()  == "{") {
+            pTree->addChild(new ParseTree("statements","")); // }
+        }
+        pTree->addChild(popToken()); // }
+    }
+
+    if (curr->getValue() == "{") { throw ParseException();}
+
+    // add validator;
+
+    
+    return pTree;
 }
 
 /**
@@ -417,7 +492,31 @@ ParseTree* CompilerParser::compileIf() {
  * @return a ParseTree
  */
 ParseTree* CompilerParser::compileWhile() {
-    return NULL;
+    ParseTree *pTree = new ParseTree("whileStatement", "");
+
+    pTree->addChild(popToken()); // while
+    pTree->addChild(popToken()); // (
+        pTree->addChild(compileExpression()); // expression
+    pTree->addChild(popToken()); // )
+    pTree->addChild(popToken()); // {
+
+    ParseTree *curr = top();
+
+    while(curr != nullptr && curr->getValue() != "}") {
+        if (isValidStatement(curr)) {
+            pTree->addChild(compileStatements());
+        }
+        curr = top();
+    }
+
+    if (pTree->getChildren().back() != nullptr && pTree->getChildren().back()->getValue()  == "{") {
+            pTree->addChild(new ParseTree("statements","")); // }
+    }
+
+    pTree->addChild(popToken()); // }
+
+    // add validator
+    return pTree;
 }
 
 /**
@@ -425,7 +524,16 @@ ParseTree* CompilerParser::compileWhile() {
  * @return a ParseTree
  */
 ParseTree* CompilerParser::compileDo() {
-    return NULL;
+    ParseTree * pTree = new ParseTree ("doStatement", "");
+
+    pTree->addChild(popToken()); // do
+    pTree->addChild(compileExpression()); // ident
+    pTree->addChild(popToken()); // ;
+
+    // add validator
+
+
+    return pTree;
 }
 
 /**
@@ -433,7 +541,23 @@ ParseTree* CompilerParser::compileDo() {
  * @return a ParseTree
  */
 ParseTree* CompilerParser::compileReturn() {
-    return NULL;
+    ParseTree *pTree = new ParseTree("returnStatement", "");
+
+    pTree->addChild(popToken()); // return
+
+    if(top() != nullptr && top()->getValue() != ";") {
+        pTree->addChild(compileExpression()); // expression
+    }
+
+    pTree->addChild(popToken()); // ;
+
+    if (top() != nullptr && top()->getValue() != ";") {
+        throw ParseException();
+    }
+
+    //ADD VALIDATOR
+
+    return pTree;
 }
 
 /**
@@ -441,7 +565,38 @@ ParseTree* CompilerParser::compileReturn() {
  * @return a ParseTree
  */
 ParseTree* CompilerParser::compileExpression() {
-    return NULL;
+    auto checkOperator = [](ParseTree* p) {
+        if (p != nullptr) {
+            if (p->getType() == "symbol") {
+                if (grammarMaps::operators.find(p->getValue()) != grammarMaps::operators.end()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    };
+    auto isEndOfStatement = [](ParseTree* p) {
+        if (p == nullptr) return true;
+        if (isValidToken("symbol", ")", p)) return true;
+        if (isValidToken("symbol", "]", p)) return true;
+        if (isValidToken("symbol", ";", p)) return true;
+        if (isValidToken("symbol", ",", p)) return true;
+        if (isValidToken("symbol", "}", p)) return true;
+        return false;
+    };
+    ParseTree * pTree = new ParseTree("expression", "");
+
+    while(!isEndOfStatement(top())) {
+        if (checkOperator(top())) {
+            pTree->addChild(popToken()); // operator
+        } else {
+            pTree->addChild(compileTerm()); // term
+        }
+    }
+
+    // validator
+
+    return pTree;
 }
 
 /**
@@ -449,7 +604,55 @@ ParseTree* CompilerParser::compileExpression() {
  * @return a ParseTree
  */
 ParseTree* CompilerParser::compileTerm() {
-    return NULL;
+    ParseTree *pTree = new ParseTree("term", "");
+    ParseTree *curr = top();
+
+    if (curr != nullptr && curr->getValue() != "(") {
+        if (curr->getType() == "identifier") {
+            pTree->addChild(popToken()); // ident
+            curr = top();
+
+            if (isValidToken("symbol","(",curr)) {
+                pTree->addChild(popToken()); // (
+                pTree->addChild(compileExpressionList()); // expression list
+                pTree->addChild(popToken()); // )
+            } else if (isValidToken("symbol", ".", curr)) {
+                pTree->addChild(popToken()); // .
+                pTree->addChild(popToken()); // ident
+                pTree->addChild(popToken()); // (
+                pTree->addChild(compileExpressionList()); // expression list
+                pTree->addChild(popToken()); // )
+            } else return pTree;
+        } else if (curr->getType() == "integerConstant") {
+            pTree->addChild(popToken()); // int
+        } else if (curr->getType() == "stringConstant") {
+            pTree->addChild(popToken()); // string
+        } else if (curr->getType() == "keyword") {
+            if (grammarMaps::keyWords.find(curr->getValue()) != grammarMaps::keyWords.end()) {
+                pTree->addChild(popToken()); // keyword
+            } else {
+                throw ParseException();
+            }
+        }
+    else if (isValidToken("symbol", "(", curr)) {
+        pTree->addChild(popToken()); // (
+        curr = top();
+
+        while (curr != nullptr && curr->getValue() != ")") {
+                pTree->addChild(compileExpression());
+            curr = top();
+        }
+        
+        if (isValidToken("symbol", ")",curr)) {
+            pTree->addChild(popToken()); // )
+        }
+        } else {
+            throw ParseException();
+        }
+    } else {
+        throw ParseException();
+    }
+    return pTree;
 }
 
 /**
@@ -457,7 +660,28 @@ ParseTree* CompilerParser::compileTerm() {
  * @return a ParseTree
  */
 ParseTree* CompilerParser::compileExpressionList() {
-    return NULL;
+    ParseTree *pTree = new ParseTree("expressionList", "");
+    auto isEndOfStatement = [](ParseTree* p) {
+        if (p == nullptr) return true;
+        if (isValidToken("symbol", ")", p)) return true;
+        if (isValidToken("symbol", "]", p)) return true;
+        if (isValidToken("symbol", ";", p)) return true;
+        if (isValidToken("symbol", "}", p)) return true;
+        return false;
+    };
+
+    ParseTree *curr = top();
+
+    while (isEndOfStatement(curr) == false) {
+        pTree->addChild(compileExpression());
+
+        if (isValidToken("symbol",",",curr)) {
+            pTree->addChild(popToken()); // ,
+        }
+        curr = top();
+    }
+
+    return pTree;
 }
 
 /**
