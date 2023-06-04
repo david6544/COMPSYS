@@ -7,52 +7,6 @@
 
 using namespace std;
 
-//List of allTokens Methods
-allTokens::allTokens(){}
-
-allTokens::allTokens(std::list<Token*> tokens){
-    for (auto i = tokens.begin(); i != tokens.end(); ++i){
-        this->tokens.push_back(*i);
-    }
-}
-
-Token* allTokens::popToken() {
-    //process token by checking through grammarMaps against typing
-    Token * curr = this->tokens.front();
-    if (curr == nullptr) throw ParseException();
-
-    if (curr->getType() == "keyword" && grammarMaps::keyWords.find(curr->getValue()) == grammarMaps::keyWords.end()) {
-        throw ParseException();
-    } else if (curr->getType() == "keyword" && grammarMaps::symbols.find(curr->getValue()) == grammarMaps::symbols.end()) {
-        throw ParseException();
-    } else if (curr->getType() == "integerConstant") {
-        int intConstant = stoi(curr->getValue());
-        if (intConstant < 0 || intConstant > 32767) {
-            throw ParseException();
-        }
-    } else if (curr->getType() == "stringConstant" && (curr->getValue().front() != '\"' || curr->getValue().back() != '\"')) {
-        throw ParseException();
-    } else if (curr->getType() == "identifier") {
-        
-        if (curr->getValue().find_first_not_of("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_()") == string::npos) {
-            throw ParseException();
-        }
-        if (curr->getValue().front() >= '0' && curr->getValue().front() <= '9') {
-            throw ParseException();
-        }
-    }
-    //pop front of tokens
-    this->tokens.erase(this->tokens.begin());
-    return curr;
-}
-
-Token* allTokens::top() {
-    return tokens[0];
-}
-string allTokens::popVal(int i) {
-    return tokens[i]->getValue();
-}
-
 /*
     ALL VALIDATORS FOR METHODS HERE
  */
@@ -136,12 +90,57 @@ string allTokens::popVal(int i) {
     }
 
 //methods
+
+//List of allTokens Methods
+
+Token* CompilerParser::popToken() {
+    //process token by checking through grammarMaps against typing
+    Token * curr = this->tokens.front();
+    if (curr == nullptr) throw ParseException();
+
+    if (curr->getType() == "keyword" && grammarMaps::keyWords.find(curr->getValue()) == grammarMaps::keyWords.end()) {
+        throw ParseException();
+    } else if (curr->getType() == "keyword" && grammarMaps::symbols.find(curr->getValue()) == grammarMaps::symbols.end()) {
+        throw ParseException();
+    } else if (curr->getType() == "integerConstant") {
+        int intConstant = stoi(curr->getValue());
+        if (intConstant < 0 || intConstant > 32767) {
+            throw ParseException();
+        }
+    } else if (curr->getType() == "stringConstant" && (curr->getValue().front() != '\"' || curr->getValue().back() != '\"')) {
+        throw ParseException();
+    } else if (curr->getType() == "identifier") {
+        
+        if (curr->getValue().find_first_not_of("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_()") == string::npos) {
+            throw ParseException();
+        }
+        if (curr->getValue().front() >= '0' && curr->getValue().front() <= '9') {
+            throw ParseException();
+        }
+    }
+    //pop front of tokens
+    this->tokens.erase(this->tokens.begin());
+    return curr;
+}
+
+Token* CompilerParser::top() {
+    return tokens.front();
+}
+string CompilerParser::popVal(int i) {
+    std::list<Token*>::iterator it;
+	it = tokens.begin();
+	advance(it,i);
+
+	return (*it)->getValue();
+}
+
+
 /**
  * Constructor for the CompilerParser
  * @param tokens A linked list of tokens to be parsed
  */
 CompilerParser::CompilerParser(std::list<Token*> tokens) {
-    this->tokens = allTokens(tokens);
+    this->tokens = tokens;
 }
 
 /**
@@ -150,7 +149,7 @@ CompilerParser::CompilerParser(std::list<Token*> tokens) {
  */
 ParseTree* CompilerParser::compileProgram() {
     //first check for a class
-    if (tokens.popVal(0) == "class" && (tokens.popVal(1) == "Main" || tokens.popVal(1) == "main")){
+    if (popVal(0) == "class" && (popVal(1) == "Main" || popVal(1) == "main")){
         return compileClass();
     } else {
         throw ParseException();
@@ -166,11 +165,11 @@ ParseTree* CompilerParser::compileClass() {
     
     ParseTree *pTree = new ParseTree("class", "");
 
-    pTree->addChild(tokens.popToken());
-    pTree->addChild(tokens.popToken());
-    pTree->addChild(tokens.popToken());
+    pTree->addChild(popToken());
+    pTree->addChild(popToken());
+    pTree->addChild(popToken());
 
-    Token* curr = tokens.top();
+    Token* curr = top();
     while (curr != nullptr && curr->getValue() != "}") {
 
         //checkiung for classVariableDeclaration
@@ -179,7 +178,7 @@ ParseTree* CompilerParser::compileClass() {
         } else if (curr->getType() == "keyword" && (curr->getValue() == "constructor" || curr->getValue() == "function" || curr->getValue() == "method")) {
             pTree->addChild(compileSubroutine());
         } else {
-            pTree->addChild(tokens.popToken());
+            pTree->addChild(popToken());
         }
     }
 
@@ -194,20 +193,20 @@ ParseTree* CompilerParser::compileClass() {
  */
 ParseTree* CompilerParser::compileClassVarDec() {
     ParseTree * pTree = new ParseTree("classVarDec", "");
-    pTree->addChild(tokens.popToken());
-    pTree->addChild(tokens.popToken());
-    pTree->addChild(tokens.popToken());
+    pTree->addChild(popToken());
+    pTree->addChild(popToken());
+    pTree->addChild(popToken());
 
-   ParseTree * curr = tokens.top();
+   ParseTree * curr = top();
 
    while (curr != nullptr && curr->getValue() == ";") {
-       pTree->addChild(tokens.popToken());
-       pTree->addChild(tokens.popToken());
-       curr = tokens.top();
+       pTree->addChild(popToken());
+       pTree->addChild(popToken());
+       curr = top();
    }
 
    //add semicol
-    pTree->addChild(tokens.popToken());
+    pTree->addChild(popToken());
 
     //validate classvardec
 
@@ -221,13 +220,13 @@ ParseTree* CompilerParser::compileClassVarDec() {
 ParseTree* CompilerParser::compileSubroutine() {
     ParseTree *pTree = new ParseTree("subroutine", "");
     
-    pTree->addChild(tokens.popToken()); // subtype
-    pTree->addChild(tokens.popToken()); // return type
-    pTree->addChild(tokens.popToken()); // add (
+    pTree->addChild(popToken()); // subtype
+    pTree->addChild(popToken()); // return type
+    pTree->addChild(popToken()); // add (
 
     pTree->addChild(compileParameterList()); // params
 
-    pTree->addChild(tokens.popToken()); // add )
+    pTree->addChild(popToken()); // add )
 
     pTree->addChild(compileSubroutineBody());
 
@@ -243,11 +242,11 @@ ParseTree* CompilerParser::compileSubroutine() {
 ParseTree* CompilerParser::compileParameterList() {
     ParseTree *pTree = new ParseTree("parameterList", "");
     
-    Token * curr = tokens.top();
+    Token * curr = top();
 
     while (curr != nullptr && curr->getValue() != ")") {
-        pTree->addChild(tokens.popToken());
-        curr = tokens.top();
+        pTree->addChild(popToken());
+        curr = top();
     }
 
     //add validation

@@ -12,25 +12,15 @@
 #include "ParseTree.h"
 #include "Token.h"
 
-struct allTokens
-{
-    private:
-    std::vector<Token*> tokens;
-    public:
-    allTokens();
-    allTokens(std::list<Token*>);
-
-    Token* popToken();
-    Token* top();
-    std::string popVal(int i);
-
-};
-
-
 class CompilerParser {
     public:
-        allTokens tokens;
+        std::list<Token*> tokens;
         CompilerParser(std::list<Token*> tokens);
+
+        Token* popToken();
+        Token* top();
+        std::string popVal(int i);
+
 
         ParseTree* compileProgram();
         ParseTree* compileClass();
