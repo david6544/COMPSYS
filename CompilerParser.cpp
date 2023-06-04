@@ -184,6 +184,8 @@ ParseTree* CompilerParser::compileClass() {
 
     // ADD VALIDATE CLASS
 
+    if (classValidator(pTree) == false) throw ParseException();
+
     return pTree;
 }
 
