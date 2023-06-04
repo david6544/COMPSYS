@@ -123,6 +123,23 @@ using namespace std;
 
 //List of allTokens Methods
 
+inline bool isValidStatement(ParseTree * curr) {
+    if (curr == nullptr) return false;
+    if (curr->getType() == "keyword" && curr->getValue() == "let") {
+        return true;
+    } else if (curr->getType() == "keyword" && curr->getValue() == "if") {
+        return true;
+    } else if (curr->getType() == "keyword" && curr->getValue() == "while") {
+        return true;
+    } else if (curr->getType() == "keyword" && curr->getValue() == "do") {
+        return true;
+    } else if (curr->getType() == "keyword" && curr->getValue() == "return") {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 Token* CompilerParser::popToken() {
     //process token by checking through grammarMaps against typing
     Token * curr = this->tokens.front();
@@ -167,8 +184,6 @@ string CompilerParser::popVal(int i) {
 
 	return (*it)->getValue();
 }
-
-
 /**
  * Constructor for the CompilerParser
  * @param tokens A linked list of tokens to be parsed
@@ -183,8 +198,10 @@ CompilerParser::CompilerParser(std::list<Token*> tokens) {
  */
 ParseTree* CompilerParser::compileProgram() {
     //first check for a class
-    if (popVal(0) == "class" && (popVal(1) == "Main" || popVal(1) == "main")){
+    if (popVal(0) == "class") {
+        if  (popVal(1) == "Main" || popVal(1) == "main") {
         return compileClass();
+        } 
     } else {
         throw ParseException();
     }
@@ -304,11 +321,11 @@ ParseTree* CompilerParser::compileParameterList() {
  * @return a ParseTree
  */
 ParseTree* CompilerParser::compileSubroutineBody() {
-    /* ParseTree *pTree = new ParseTree("subroutineBody", "");
+    ParseTree *pTree = new ParseTree("subroutineBody", "");
     
-    pTree->addChild(tokens.popToken()); // add {
+    pTree->addChild(popToken()); // add {
 
-    Token * curr = tokens.top();
+    Token * curr = top();
 
     while (curr != nullptr  && curr->getValue() != "}") {
         if (curr->getType() == "keyword" && curr->getValue() == "var") {
@@ -316,15 +333,15 @@ ParseTree* CompilerParser::compileSubroutineBody() {
         } else {
             pTree->addChild(compileStatements());
         }
-        curr = tokens.top();
+        curr = top();
     }
 
-    pTree->addChild(tokens.popToken()); // add }
+    pTree->addChild(popToken()); // add }
     
     // add validation
 
     //return pTree;
-    return NULL; */
+    return pTree;
 }
 
 /**
@@ -332,26 +349,26 @@ ParseTree* CompilerParser::compileSubroutineBody() {
  * @return a ParseTree
  */
 ParseTree* CompilerParser::compileVarDec() {
-   /*  ParseTree *pTree = new ParseTree("subroutineBody", "");
+    ParseTree *pTree = new ParseTree("subroutineBody", "");
     
-    pTree->addChild(tokens.popToken()); // var
-    pTree->addChild(tokens.popToken()); // type
-    pTree->addChild(tokens.popToken()); // first ident
+    pTree->addChild(popToken()); // var
+    pTree->addChild(popToken()); // type
+    pTree->addChild(popToken()); // first ident
 
-    Token * curr = tokens.top();
+    Token * curr = top();
 
     while(curr != nullptr && curr->getValue() != ";") {
-        pTree->addChild(tokens.popToken()); // ,
-        pTree->addChild(tokens.popToken()); // ident
-        curr = tokens.top();
+        pTree->addChild(popToken()); // ,
+        pTree->addChild(popToken()); // ident
+        curr = top();
     }
 
-    pTree->addChild(tokens.popToken()); // ;
+    pTree->addChild(popToken()); // ;
 
     //validate
 
-    return NULL;
-    //return pTree; */
+    return pTree;
+    //return pTree;
 }
 
 /**
@@ -359,7 +376,24 @@ ParseTree* CompilerParser::compileVarDec() {
  * @return a ParseTree
  */
 ParseTree* CompilerParser::compileStatements() {
-    return NULL;
+    ParseTree *pTree = new ParseTree("statements", "");
+    ParseTree *curr = top();
+    while (isValidStatement(curr)) {
+        if (curr->getValue() == "do") {
+            pTree->addChild(compileDo());
+        } else if (curr->getValue() == "let") {
+            pTree->addChild(compileLet());
+        } else if (curr->getValue() == "return") {
+            pTree->addChild(compileReturn());
+        } else if (curr->getValue() == "if") {
+            pTree->addChild(compileIf());
+        } else if (curr->getValue() == "while") {
+            pTree->addChild(compileWhile());
+        }
+        curr = top();
+    }
+
+    return pTree;
 }
 
 /**
