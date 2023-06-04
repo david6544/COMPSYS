@@ -138,14 +138,14 @@ using namespace std;
         }
 
         cout << children.size() << endl;
-        if (children.size() == 2 || (children.size() > 2 && children.size() % 3 != 0)) {
+        if (children.size() < 2 || (children.size() > 2 && children.size() % 3 != 0)) {
             return false;
         }
         cout << " temp";
 
         list<ParseTree*>::iterator it = children.begin();
 
-        for (; std::next(it) != children.end(); std::advance(it, 3)) {
+        for (int i = 0; i < children.size() && std::next(it) != children.end(); std::advance(it, 3), i+= 3) {
             if (validateType(*it))
             return false;
             if ((*next(it))->getType() != "identifier") return false;
@@ -156,6 +156,7 @@ using namespace std;
                 return false;
             }
         }
+        cout << "loop";
         return true;
     }
     bool subroutineBodyValidator(ParseTree* pTree) {
@@ -486,9 +487,9 @@ ParseTree* CompilerParser::compileParameterList() {
         curr = top();
     }
 
-
     //add validation
     if (parameterListValidator(pTree) == false) throw ParseException();
+    cout << "ooga";
 
     return pTree;
 }
