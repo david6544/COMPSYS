@@ -461,8 +461,8 @@ ParseTree* CompilerParser::compileIf() {
 
     // check for an else block
 
-    /* curr = top();
-    if (curr != nullptr && curr->getValue() == "else") {
+    curr = top();
+    if (isValidToken("keyword","else",curr)) {
         pTree->addChild(popToken()); // else
         pTree->addChild(popToken()); // {
         curr = top();
@@ -479,7 +479,7 @@ ParseTree* CompilerParser::compileIf() {
         pTree->addChild(popToken()); // }
     }
 
-    if (curr->getValue() == "{") { throw ParseException();} */
+    if (curr->getValue() == "{") { throw ParseException();}
 
     // add validator;
 
