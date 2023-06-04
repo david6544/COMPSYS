@@ -47,8 +47,38 @@ using namespace std;
     }
 
     bool classVarDecValidator(ParseTree* pTree) {
+        list<ParseTree*> children = pTree->getChildren();
+        list<ParseTree*>::iterator it = children.begin();
+
+        if (pTree->getType() != "classVarDec" || pTree->getValue() != "") {
+            throw ParseException();
+        }
+        if (children.front()->getType() != "keyword" || (children.front()->getValue() != "static" && children.front()->getValue() != "field")) {
+            throw ParseException();
+        }
+        it = next(it);
+        if ((*it)->getType() != "keyword" || grammarMaps::variableTypes.find((*it)->getValue()) == grammarMaps::variableTypes.end()) {
+            throw ParseException();
+        }
+
+        it = next(it);
+
+        for (int i = 2; std::next(it) != children.end(); i++) {
+        if (i % 2 == 0) {
+            if ((*it)->getType() != "identifier")
+                return false;
+        } else {
+            if ((*it)->getType() != "symbol" || (*it)->getValue() != ",")
+                return false;
+        }
+        ++it;
+        }
+
+        if ((*it)->getType() != "symbol" || (*it)->getValue() != ";")
+            return false;
+
         return true;
-    }
+        }
     bool subroutineValidator(ParseTree* pTree) {
         return true;
     }
@@ -222,6 +252,8 @@ ParseTree* CompilerParser::compileClassVarDec() {
     pTree->addChild(popToken());
 
     //validate classvardec
+
+    if (classVarDecValidator(pTree) == false) throw ParseException();
 
     return pTree;
 }
