@@ -166,9 +166,33 @@ using namespace std;
         return true;
     }
     bool varDecValidator(ParseTree* pTree) {
-        return true;
-    }
-    bool statementsValidator(ParseTree* pTree) {
+        list<ParseTree *> children = pTree->getChildren();
+        list<ParseTree *>::iterator it = children.begin();
+
+        if (pTree->getType() != "varDec" || pTree->getValue() != "")
+            throw ParseException();
+        
+        if ((*it)->getType() != "keyword" || (*it)->getValue() != "var")
+            throw ParseException();
+
+        ++it;
+
+        if ((*it)->getType() != "keyword" || grammarMaps::variableTypes.find((*it)->getValue()) == grammarMaps::variableTypes.end())
+            throw ParseException();
+
+        
+        for (int i = 2; std::next(it) != children.end(); i++) {
+            if (i % 2 == 0) {
+                if ((*it)->getType() != "identifier")
+                    return false;
+            }
+            else {
+                if ((*it)->getType() != "symbol" || (*it)->getValue() != ",")
+                    return false;
+            }
+            ++it;
+        }
+
         return true;
     }
     bool letValidator(ParseTree* pTree) {
@@ -452,6 +476,7 @@ ParseTree* CompilerParser::compileVarDec() {
     pTree->addChild(popToken()); // ;
 
     //validate
+    if (varDecValidator(pTree) == false) throw ParseException();
 
     return pTree;
     //return pTree;
@@ -478,6 +503,8 @@ ParseTree* CompilerParser::compileStatements() {
         }
         curr = top();
     }
+
+
 
     return pTree;
 }
