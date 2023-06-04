@@ -98,10 +98,14 @@ Token* CompilerParser::popToken() {
     Token * curr = this->tokens.front();
     if (curr == nullptr) throw ParseException();
 
-    if (curr->getType() == "keyword" && grammarMaps::keyWords.find(curr->getValue()) == grammarMaps::keyWords.end()) {
-        throw ParseException();
-    } else if (curr->getType() == "keyword" && grammarMaps::symbols.find(curr->getValue()) == grammarMaps::symbols.end()) {
-        throw ParseException();
+    if (curr->getType() == "keyword") {
+        if (grammarMaps::keyWords.find(curr->getValue()) == grammarMaps::keyWords.end()) {
+            throw ParseException();
+        }
+    } else if (curr->getType() == "keyword") {
+        if (grammarMaps::symbols.find(curr->getValue()) == grammarMaps::keyWords.end()) {
+            throw ParseException();
+        }
     } else if (curr->getType() == "integerConstant") {
         int intConstant = stoi(curr->getValue());
         if (intConstant < 0 || intConstant > 32767) {
@@ -111,15 +115,15 @@ Token* CompilerParser::popToken() {
         throw ParseException();
     } else if (curr->getType() == "identifier") {
         
-        if (curr->getValue().find_first_not_of("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_()") == string::npos) {
+        if (curr->getValue().front() >= '0' && curr->getValue().front() <= '9') {
             throw ParseException();
         }
-        if (curr->getValue().front() >= '0' && curr->getValue().front() <= '9') {
+        if (curr->getValue().find_first_not_of("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_()") == string::npos) {
             throw ParseException();
         }
     }
     //pop front of tokens
-    this->tokens.erase(this->tokens.begin());
+    tokens.pop_front();
     return curr;
 }
 
@@ -194,14 +198,21 @@ ParseTree* CompilerParser::compileClass() {
  * @return a ParseTree
  */
 ParseTree* CompilerParser::compileClassVarDec() {
+    auto checkComma = [](ParseTree* pTree) {
+        if (pTree==nullptr) return true;
+        if (pTree->getValue() == ",") return true;
+        return false;
+    };
+
     ParseTree * pTree = new ParseTree("classVarDec", "");
     pTree->addChild(popToken());
     pTree->addChild(popToken());
     pTree->addChild(popToken());
 
-   ParseTree * curr = top();
 
-   while (curr != nullptr && curr->getValue() == ";") {
+   ParseTree *curr = top();
+
+   while (checkComma(curr)) {
        pTree->addChild(popToken());
        pTree->addChild(popToken());
        curr = top();
