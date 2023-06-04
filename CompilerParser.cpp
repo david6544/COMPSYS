@@ -53,8 +53,87 @@ string allTokens::popVal(int i) {
     return tokens[i]->getValue();
 }
 
+/*
+    ALL VALIDATORS FOR METHODS HERE
+ */
+    bool classValidator(ParseTree* pTree) {
+        vector<ParseTree *> children = pTree->getChildren();
+        
+        if (pTree->getType() != "class" || pTree->getValue() != "") {
+            return false;
+        }
+        //if first element is not class or keyword class
+        if (children.front()->getType() != "keyword" || children.front()->getValue() != "class") {
+            return false;
+        }
+        
+        // if second element isnt an identifier
+        if (children[1]->getType() != "identifier") {
+            return false;
+        }
+        if (children[2]->getType() != "symbol" || children[2]->getValue() != "{") {
+            return false;
+        }
 
+        int i = 3;
+        while (children[i] != nullptr && (children[i]->getType() != "symbol" && children[i]->getValue() != "}")) {
+            if (children[i]->getType() != "classVarDec" && children[i]->getType() != "subroutine") {
+                return false;
+            }
+            i++;
+        }
 
+        if (i != children.size() -1 || children[i]->getValue() != "}") {
+            return false;
+        }
+
+        return true;
+    }
+
+    bool classVarDecValidator(ParseTree* pTree) {
+        return true;
+    }
+    bool subroutineValidator(ParseTree* pTree) {
+        return true;
+    }
+    bool parameterListValidator(ParseTree* pTree) {
+        return true;
+    }
+    bool subroutineBodyValidator(ParseTree* pTree) {
+        return true;
+    }
+    bool varDecValidator(ParseTree* pTree) {
+        return true;
+    }
+    bool statementsValidator(ParseTree* pTree) {
+        return true;
+    }
+    bool letValidator(ParseTree* pTree) {
+        return true;
+    }
+    bool ifValidator(ParseTree* pTree) {
+        return true;
+    }
+    bool whileValidator(ParseTree* pTree) {
+        return true;
+    }
+    bool doValidator(ParseTree* pTree) {
+        return true;
+    }
+    bool returnValidator(ParseTree* pTree) {
+        return true;
+    }
+    bool expressionValidator(ParseTree* pTree) {
+        return true;
+    }
+    bool termValidator(ParseTree* pTree) {
+        return true;
+    }
+    bool expressionListValidator(ParseTree* pTree) {
+        return true;
+    }
+
+//methods
 /**
  * Constructor for the CompilerParser
  * @param tokens A linked list of tokens to be parsed
@@ -179,7 +258,7 @@ ParseTree* CompilerParser::compileParameterList() {
  * @return a ParseTree
  */
 ParseTree* CompilerParser::compileSubroutineBody() {
-    /* ParseTree *pTree = new ParseTree("subroutineBody", "");
+    ParseTree *pTree = new ParseTree("subroutineBody", "");
     
     pTree->addChild(tokens.popToken()); // add {
 
@@ -198,7 +277,7 @@ ParseTree* CompilerParser::compileSubroutineBody() {
     
     // add validation
 
-    return pTree; */
+    return pTree;
     return NULL;
 }
 
@@ -207,7 +286,7 @@ ParseTree* CompilerParser::compileSubroutineBody() {
  * @return a ParseTree
  */
 ParseTree* CompilerParser::compileVarDec() {
-   /*  ParseTree *pTree = new ParseTree("subroutineBody", "");
+    ParseTree *pTree = new ParseTree("subroutineBody", "");
     
     pTree->addChild(tokens.popToken()); // var
     pTree->addChild(tokens.popToken()); // type
@@ -221,7 +300,7 @@ ParseTree* CompilerParser::compileVarDec() {
         curr = tokens.top();
     }
 
-    pTree->addChild(tokens.popToken()); // ; */
+    pTree->addChild(tokens.popToken()); // ;
 
     //validate
 

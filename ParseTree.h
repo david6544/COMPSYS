@@ -3,19 +3,20 @@
 
 #include <string>
 #include <list>
+#include<vector>
 
 class ParseTree {
     private:
         std::string type;
         std::string value;
-        std::list<ParseTree*> children;
+        std::vector<ParseTree*> children;
 
     public:
         ParseTree(std::string type, std::string value);
 
         void addChild(ParseTree* child);
 
-        std::list<ParseTree*> getChildren();
+        std::vector<ParseTree*> getChildren();
 
         std::string getType();
 

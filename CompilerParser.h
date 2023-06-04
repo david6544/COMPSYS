@@ -28,8 +28,6 @@ struct allTokens
 
 
 class CompilerParser {
-    private:
-    // add validators
     public:
         allTokens tokens;
         CompilerParser(std::list<Token*> tokens);
