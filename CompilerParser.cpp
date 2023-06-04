@@ -457,7 +457,7 @@ ParseTree* CompilerParser::compileIf() {
         curr = top();
     }
 
-    if (pTree->getChildren().back() != nullptr && pTree->getChildren().back()->getValue()  == "{") {
+    if (isValidToken("symbol", "}", pTree->getChildren().back())) {
         pTree->addChild(new ParseTree("statements","")); // }
     }
 
@@ -477,13 +477,13 @@ ParseTree* CompilerParser::compileIf() {
             curr = top();
         }
         if (curr != nullptr && curr->getValue() != "}") { throw ParseException();} 
-        if (pTree->getChildren().back() != nullptr && pTree->getChildren().back()->getValue()  == "{") {
+        if (isValidToken("symbol", "}", pTree->getChildren().back())) {
             pTree->addChild(new ParseTree("statements","")); // }
         }
         pTree->addChild(popToken()); // }
     }
 
-    if (curr->getValue() == "{") { throw ParseException();}
+    if (isValidToken("symbol","{",curr)) throw ParseException();
 
     // add validator;
 
