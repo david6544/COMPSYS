@@ -137,11 +137,9 @@ using namespace std;
             return true;
         }
 
-        cout << children.size() << endl;
         if (children.size() < 2 || (children.size() > 2 && children.size() % 3 != 0)) {
             return false;
         }
-        cout << " temp";
 
         list<ParseTree*>::iterator it = children.begin();
 
@@ -156,7 +154,6 @@ using namespace std;
                 return false;
             }
         }
-        cout << "loop";
         return true;
     }
     bool subroutineBodyValidator(ParseTree* pTree) {
@@ -232,8 +229,7 @@ using namespace std;
 
         if((*it)->getType() != "identifier") return false;
 
-        cout << (*it)->getType() << " " << (*it)->getValue() << endl;
-        cout << children.size() << endl;
+       
 
         if(children.size() == 5) {
             it++;
@@ -339,7 +335,6 @@ Token* CompilerParser::popToken() {
         }
     }
 
-    cout << curr->getValue() << endl;
 
     //pop front of tokens
     tokens.pop_front();
@@ -462,14 +457,12 @@ ParseTree* CompilerParser::compileSubroutine() {
     pTree->addChild(popToken()); // add (
 
     pTree->addChild(compileParameterList()); // params
-    cout << "tesdfgsdgt";
     pTree->addChild(popToken()); // add )
 
     pTree->addChild(compileSubroutineBody());
 
     //validate subroutine
     if (subroutineValidator(pTree) == false) throw ParseException();
-    cout << " asdasd" << endl;
     
     return pTree;
 }
@@ -490,7 +483,6 @@ ParseTree* CompilerParser::compileParameterList() {
 
     //add validation
     if (parameterListValidator(pTree) == false) throw ParseException();
-    cout << "ooga";
 
     return pTree;
 }
@@ -548,7 +540,6 @@ ParseTree* CompilerParser::compileVarDec() {
 
     //validate
     if (varDecValidator(pTree) == false) throw ParseException();
-    cout << " step4" << endl;
 
     return pTree;
     //return pTree;
@@ -603,11 +594,10 @@ ParseTree* CompilerParser::compileLet() {
     pTree->addChild(popToken()); // =
     pTree->addChild(compileExpression()); // expression
     pTree->addChild(popToken()); // ;
-    
+
 
     // add validator
     if(letValidator(pTree) == false) throw ParseException();
-    cout << " asod";
 
 
     return pTree;
@@ -821,7 +811,7 @@ ParseTree* CompilerParser::compileTerm() {
                 throw ParseException();
             }
         }
-    else if (isValidToken("symbol", "(", curr)) {
+    } else if (isValidToken("symbol", "(", curr)) {
         pTree->addChild(popToken()); // (
         curr = top();
 
@@ -832,7 +822,6 @@ ParseTree* CompilerParser::compileTerm() {
         
         if (isValidToken("symbol", ")",curr)) {
             pTree->addChild(popToken()); // )
-        }
         } else {
             throw ParseException();
         }
