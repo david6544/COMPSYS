@@ -277,7 +277,7 @@ ParseTree* CompilerParser::compileSubroutineBody() {
     
     // add validation
 
-    return pTree;
+    //return pTree;
     return NULL;
 }
 
