@@ -7,6 +7,8 @@
 
 using namespace std;
 
+
+
     inline bool isInvalidToken(const string& type, const string& val, ParseTree* curr) {
         if (curr == nullptr) return true;
         if (curr ->getType() != type && curr->getValue() != val) return true;
@@ -18,7 +20,6 @@ using namespace std;
  */
     bool classValidator(ParseTree* pTree) {
         std::list<ParseTree *> children = pTree->getChildren();
-
     if (pTree->getType() != "class" || pTree->getValue() != "") {
         return false;
     }
@@ -45,6 +46,8 @@ using namespace std;
         ++it;
     }
 
+    //it = prev(it);
+    cout << (*it)->getValue() << endl;
     if (it != std::prev(children.end()) || (*it)->getValue() != "}") {
         return false;
     }
@@ -91,12 +94,17 @@ using namespace std;
 
         list<ParseTree*> children = pTree->getChildren();
         list<ParseTree*>::iterator it = children.begin();
-        ++it;
+
 
         if((*it)->getType() != "keyword" || ((*it)->getValue() != "constructor" && (*it)->getValue() != "function" && (*it)->getValue() != "method")) return false;
-        if ((*it)->getType() != "identifier" || (grammarMaps::variableTypes.find((*it)->getValue()) == grammarMaps::variableTypes.end() && (*it)->getValue() != "void")) {
+        cout << (*it)->getType() << " " << (*it)->getValue() << endl;
+
+        it++;
+    
+        if ((*it)->getType() != "keyword" || (grammarMaps::variableTypes.find((*it)->getValue()) == grammarMaps::variableTypes.end() && (*it)->getValue() != "void")) {
             return false;
         }
+        cout << " test";
 
         it++;
         if((*it)->getType() != "identifier") return false;
@@ -129,9 +137,11 @@ using namespace std;
             return true;
         }
 
-        if (children.size() < 2 || (children.size() != 2 && (children.size() + 1) % 3 != 0)) {
+        cout << children.size() << endl;
+        if (children.size() == 2 || (children.size() > 2 && children.size() % 3 != 0)) {
             return false;
         }
+        cout << " temp";
 
         list<ParseTree*>::iterator it = children.begin();
 
@@ -174,20 +184,30 @@ using namespace std;
     bool varDecValidator(ParseTree* pTree) {
         list<ParseTree *> children = pTree->getChildren();
         list<ParseTree *>::iterator it = children.begin();
-
-        if (pTree->getType() != "varDec" || pTree->getValue() != "")
-            throw ParseException();
+        
+        if (pTree->getType() != "varDec" || pTree->getValue() != "") throw ParseException();
+        
         
         if ((*it)->getType() != "keyword" || (*it)->getValue() != "var")
             throw ParseException();
 
+        //cout << (*it)->getValue() << endl;
         ++it;
 
-        if ((*it)->getType() != "keyword" || grammarMaps::variableTypes.find((*it)->getValue()) == grammarMaps::variableTypes.end())
-            throw ParseException();
+        if ((*it)->getType() != "identifier") {
+            if ((*it)->getType() != "keyword" || grammarMaps::variableTypes.find((*it)->getValue()) == grammarMaps::variableTypes.end())
+                throw ParseException();
+        }
 
-        
-        for (int i = 2; std::next(it) != children.end(); i++) {
+        //cout << (*it)->getValue() << endl;
+
+        /* for (auto x : children) {
+            cout << x->getValue() << " ";
+        } */
+
+        ++it;
+
+        for (int i = 2; next(it) != children.end(); i++) {
             if (i % 2 == 0) {
                 if ((*it)->getType() != "identifier")
                     return false;
@@ -292,13 +312,12 @@ Token* CompilerParser::popToken() {
     //process token by checking through grammarMaps against typing
     Token * curr = this->tokens.front();
     if (curr == nullptr) throw ParseException();
-
     if (curr->getType() == "keyword") {
         if (grammarMaps::keyWords.find(curr->getValue()) == grammarMaps::keyWords.end()) {
             throw ParseException();
         }
-    } else if (curr->getType() == "keyword") {
-        if (grammarMaps::symbols.find(curr->getValue()) == grammarMaps::keyWords.end()) {
+    } else if (curr->getType() == "symbol") {
+        if (grammarMaps::symbols.find(curr->getValue()) == grammarMaps::symbols.end()) {
             throw ParseException();
         }
     } else if (curr->getType() == "integerConstant") {
@@ -313,10 +332,13 @@ Token* CompilerParser::popToken() {
         if (curr->getValue().front() >= '0' && curr->getValue().front() <= '9') {
             throw ParseException();
         }
-        if (curr->getValue().find_first_not_of("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_()") == string::npos) {
+        if (curr->getValue().find_first_not_of("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_()") != string::npos) {
             throw ParseException();
         }
     }
+
+    cout << curr->getValue() << endl;
+
     //pop front of tokens
     tokens.pop_front();
     return curr;
@@ -360,17 +382,16 @@ ParseTree* CompilerParser::compileProgram() {
  * Generates a parse tree for a single class
  * @return a ParseTree
  */
-ParseTree* CompilerParser::compileClass() {
-    
+ParseTree* CompilerParser::compileClass() {    
     ParseTree *pTree = new ParseTree("class", "");
 
     pTree->addChild(popToken());
     pTree->addChild(popToken());
     pTree->addChild(popToken());
 
-    Token* curr = top();
-    while (curr != nullptr && curr->getValue() != "}") {
 
+    while ((pTree->getChildren().back() != nullptr && pTree->getChildren().back()->getValue() != "}")) {
+            Token* curr = top();
         //checkiung for classVariableDeclaration
         if (curr->getType() == "keyword" && (curr->getValue() == "static" || curr->getValue() == "field")) {
             pTree->addChild(compileClassVarDec());
@@ -382,6 +403,7 @@ ParseTree* CompilerParser::compileClass() {
     }
 
     // ADD VALIDATE CLASS
+
 
     if (classValidator(pTree) == false) throw ParseException();
 
@@ -395,7 +417,9 @@ ParseTree* CompilerParser::compileClass() {
 ParseTree* CompilerParser::compileClassVarDec() {
     auto checkComma = [](ParseTree* pTree) {
         if (pTree==nullptr) return true;
-        if (pTree->getValue() == ",") return true;
+        if (pTree->getType() == "symbol") {
+            if (pTree->getValue() == ",") return true;
+        }
         return false;
     };
 
@@ -432,17 +456,18 @@ ParseTree* CompilerParser::compileSubroutine() {
     
     pTree->addChild(popToken()); // subtype
     pTree->addChild(popToken()); // return type
+    pTree->addChild(popToken()); // name
     pTree->addChild(popToken()); // add (
 
     pTree->addChild(compileParameterList()); // params
-
+    cout << "tesdfgsdgt";
     pTree->addChild(popToken()); // add )
 
     pTree->addChild(compileSubroutineBody());
 
     //validate subroutine
     if (subroutineValidator(pTree) == false) throw ParseException();
-
+    cout << " asdasd" << endl;
     
     return pTree;
 }
@@ -453,13 +478,14 @@ ParseTree* CompilerParser::compileSubroutine() {
  */
 ParseTree* CompilerParser::compileParameterList() {
     ParseTree *pTree = new ParseTree("parameterList", "");
-    
+
     Token * curr = top();
 
     while (curr != nullptr && curr->getValue() != ")") {
         pTree->addChild(popToken());
         curr = top();
     }
+
 
     //add validation
     if (parameterListValidator(pTree) == false) throw ParseException();
@@ -500,15 +526,16 @@ ParseTree* CompilerParser::compileSubroutineBody() {
  * @return a ParseTree
  */
 ParseTree* CompilerParser::compileVarDec() {
-    ParseTree *pTree = new ParseTree("subroutineBody", "");
+    ParseTree *pTree = new ParseTree("varDec", "");
     
     pTree->addChild(popToken()); // var
     pTree->addChild(popToken()); // type
     pTree->addChild(popToken()); // first ident
+    
 
     Token * curr = top();
 
-    while(curr != nullptr && curr->getValue() != ";") {
+    while(curr == nullptr || (curr->getType() == "symbol" && curr->getValue() == ",")) {
         pTree->addChild(popToken()); // ,
         pTree->addChild(popToken()); // ident
         curr = top();
@@ -516,8 +543,10 @@ ParseTree* CompilerParser::compileVarDec() {
 
     pTree->addChild(popToken()); // ;
 
+
     //validate
     if (varDecValidator(pTree) == false) throw ParseException();
+    cout << " step4" << endl;
 
     return pTree;
     //return pTree;
