@@ -196,6 +196,40 @@ using namespace std;
         return true;
     }
     bool letValidator(ParseTree* pTree) {
+        if (isInvalidToken("letStatment","",pTree)) return false;
+
+        list<ParseTree*> children = pTree->getChildren();
+        list<ParseTree*>::iterator it = children.begin();
+
+        if (isInvalidToken("keyword","let",*it)) return false;
+        it++;
+
+        if((*it)->getType() != "identifier") return false;
+
+
+        if(children.size() == 5) {
+            it++;
+            if (isInvalidToken("symbol","=",*it)) return false;
+            it++;
+            if ((*it)->getType() != "expression") return false;
+            it++;
+            if (isInvalidToken("symbol",";",*it)) return false;
+        } else if (children.size() == 8) {
+            it++;
+            if (isInvalidToken("symbol","[",*it)) return false;
+            it++;
+            if ((*it)->getType() != "expression") return false;
+            it++;
+            if (isInvalidToken("symbol","]",*it)) return false;
+            it++;
+            if (isInvalidToken("symbol","=",*it)) return false;
+            it++;
+            if ((*it)->getType() != "expression") return false;
+            it++;
+            if (isInvalidToken("symbol",";",*it)) return false;
+        } else {
+            return false;
+        }
         return true;
     }
     bool ifValidator(ParseTree* pTree) {
@@ -223,6 +257,11 @@ using namespace std;
 //methods
 
 //List of allTokens Methods
+inline bool isInvalidToken(const string& type, const string& val, ParseTree* curr) {
+    if (curr == nullptr) return true;
+    if (curr ->getType() != type && curr->getValue() != val) return true;
+    return false;
+}
 
 inline bool isValidStatement(ParseTree * curr) {
     if (curr == nullptr) return false;
@@ -533,6 +572,8 @@ ParseTree* CompilerParser::compileLet() {
 
 
     // add validator
+    if(letValidator(pTree) == false) throw ParseException();
+    
 
     return pTree;
 }
