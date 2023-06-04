@@ -106,6 +106,41 @@ using namespace std;
         return true;
     }
     bool parameterListValidator(ParseTree* pTree) {
+
+        auto validateType = [](ParseTree* curr) {
+            if (curr == nullptr) return true;
+            if (curr->getType() == "identifier") return false;
+            if (curr->getType() == "keyword" && grammarMaps::variableTypes.find(curr->getValue()) != grammarMaps::variableTypes.end()) return false;
+            
+            return true;
+        };
+
+        if (pTree->getType() != "parameterList" || pTree->getValue() != "") return false;
+
+        list<ParseTree*> children = pTree->getChildren();
+        list<ParseTree*>::iterator it = children.begin();
+
+        if (children.empty()) {
+            return true;
+        }
+
+        if (children.size() < 2 || (children.size() != 2 && (children.size() + 1) % 3 != 0)) {
+            return false;
+        }
+
+        auto it = children.begin();
+
+        for (; std::next(it) != children.end(); std::advance(it, 3)) {
+            if (validateType(*it))
+            return false;
+            if ((*next(it))->getType() != "identifier") return false;
+
+            if (distance(it, children.end()) >= 3) {
+            auto nextIt = std::next(it, 2);
+            if ((*nextIt)->getType() != "symbol" || (*nextIt)->getValue() != ",")
+                return false;
+            }
+        }
         return true;
     }
     bool subroutineBodyValidator(ParseTree* pTree) {
@@ -343,6 +378,7 @@ ParseTree* CompilerParser::compileParameterList() {
     }
 
     //add validation
+    if (parameterListValidator(pTree) == false) throw ParseException();
 
     return pTree;
 }
