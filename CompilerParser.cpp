@@ -227,12 +227,13 @@ using namespace std;
 
         list<ParseTree*> children = pTree->getChildren();
         list<ParseTree*>::iterator it = children.begin();
-
         if (isInvalidToken("keyword","let",*it)) return false;
         it++;
 
         if((*it)->getType() != "identifier") return false;
 
+        cout << (*it)->getType() << " " << (*it)->getValue() << endl;
+        cout << children.size() << endl;
 
         if(children.size() == 5) {
             it++;
@@ -595,16 +596,18 @@ ParseTree* CompilerParser::compileLet() {
         pTree->addChild(popToken()); // [
         pTree->addChild(compileExpression()); // expression
         pTree->addChild(popToken()); // ]
-    } else if (curr->getValue() == "=") {
-        pTree->addChild(popToken()); // =
-        pTree->addChild(compileExpression()); // expression
-    } else {
+    } else if (isInvalidToken("symbol","=",curr)) {
         throw ParseException();
     }
 
+    pTree->addChild(popToken()); // =
+    pTree->addChild(compileExpression()); // expression
+    pTree->addChild(popToken()); // ;
+    
 
     // add validator
     if(letValidator(pTree) == false) throw ParseException();
+    cout << " asod";
 
 
     return pTree;
