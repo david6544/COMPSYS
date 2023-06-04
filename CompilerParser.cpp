@@ -118,7 +118,6 @@ using namespace std;
         if (pTree->getType() != "parameterList" || pTree->getValue() != "") return false;
 
         list<ParseTree*> children = pTree->getChildren();
-        list<ParseTree*>::iterator it = children.begin();
 
         if (children.empty()) {
             return true;
@@ -128,7 +127,7 @@ using namespace std;
             return false;
         }
 
-        auto it = children.begin();
+        list<ParseTree*>::iterator it = children.begin();
 
         for (; std::next(it) != children.end(); std::advance(it, 3)) {
             if (validateType(*it))
